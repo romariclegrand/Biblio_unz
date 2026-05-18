@@ -13,20 +13,20 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
 
 # Application definition
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    # Nos applications
-    'apps.users',
-    'apps.books',
-    'apps.loans',
-    'apps.notifications',
-    'apps.statistics',
-]
+# INSTALLED_APPS = [
+#     'django.contrib.admin',
+#     'django.contrib.auth',
+#     'django.contrib.contenttypes',
+#     'django.contrib.sessions',
+#     'django.contrib.messages',
+#     'django.contrib.staticfiles',
+#     # Nos applications
+#     'apps.users',
+#     'apps.books',
+#     'apps.loans',
+#     'apps.notifications',
+#     'apps.statistics',
+# ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -79,7 +79,7 @@ else:
     }
 
 # Authentification personnalisée
-AUTH_USER_MODEL = 'users.Utilisateur'
+#AUTH_USER_MODEL = 'users.Utilisateur'
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},

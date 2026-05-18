@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1>📚 Tableau de bord Étudiant</h1>
+    <p>Bienvenue {{ user.first_name }} {{ user.last_name }} !</p>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Mes emprunts</h5>
+                    <p class="card-text">Consultez vos emprunts en cours</p>
+                    <a href="#" class="btn btn-primary">Voir</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Catalogue</h5>
+                    <p class="card-text">Rechercher des ouvrages</p>
+                    <a href="#" class="btn btn-primary">Rechercher</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

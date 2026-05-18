@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1>Tableau de bord</h1>
+    <p>Bienvenue {{ user.username }} !</p>
+    <p>Rôle : {{ user.get_role_display }}</p>
+    <a href="{% url 'users:logout' %}" class="btn btn-danger">Déconnexion</a>
+</div>
+{% endblock %}
