@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ livre.titre }} - Biblio_UNZ{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'books:catalogue' %}">Catalogue</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ livre.titre }}</li>
+            </ol>
+        </nav>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">{{ livre.titre }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 30%">Auteur</th>
+                                <td>{{ livre.auteur }}</td>
+                            </tr>
+                            <tr>
+                                <th>ISBN</th>
+                                <td>{{ livre.isbn }}</td>
+                            </tr>
+                            <tr>
+                                <th>Catégorie</th>
+                                <td>
+                                    {% if livre.categorie %}
+                                        <a href="{% url 'books:livres_par_categorie' livre.categorie.id %}">
+                                            {{ livre.categorie.nom }}
+                                        </a>
+                                    {% else %}
+                                        Non catégorisé
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Éditeur</th>
+                                <td>{{ livre.editeur|default:"Non spécifié" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Année de publication</th>
+                                <td>{{ livre.annee_publication|default:"Non spécifiée" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Exemplaires</th>
+                                <td>
+                                    Total : {{ livre.nombre_exemplaires }}<br>
+                                    Disponibles : {{ livre.nombre_disponibles }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Statut</th>
+                                <td>
+                                    {% if livre.nombre_disponibles > 0 %}
+                                        <span class="badge bg-success">Disponible</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Indisponible</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                {% if user.is_authenticated %}
+                    <div class="mt-3">
+                        {% if livre.nombre_disponibles > 0 %}
+                            <a href="#" class="btn btn-success">Emprunter ce livre</a>
+                        {% else %}
+                            <a href="#" class="btn btn-warning">Réserver ce livre</a>
+                        {% endif %}
+                        <a href="{% url 'books:catalogue' %}" class="btn btn-secondary">Retour au catalogue</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
