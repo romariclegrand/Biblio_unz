@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>📊 Statistiques</h2>
+<div class="card mb-3"><div class="card-body"><form method="get" class="row"><div class="col-md-3"><label>Période</label><select name="periode" class="form-select" onchange="this.form.submit()"><option value="semaine" {% if periode == 'semaine' %}selected{% endif %}>Semaine</option><option value="mois" {% if periode == 'mois' %}selected{% endif %}>Mois</option><option value="semestre" {% if periode == 'semestre' %}selected{% endif %}>Semestre</option><option value="annee" {% if periode == 'annee' %}selected{% endif %}>Année</option></select></div></form></div></div>
+<div class="row"><div class="col-md-6"><div class="card"><div class="card-header bg-dark text-white">Top livres empruntés</div><div class="card-body"><ul class="list-group">{% for livre in top_livres %}<li class="list-group-item">{{ livre.ouvrage__titre }} - {{ livre.total }} emprunts</li>{% empty %}<li>Aucune donnée</li>{% endfor %}</ul></div></div></div><div class="col-md-6"><div class="card"><div class="card-header bg-dark text-white">Taux de retard</div><div class="card-body"><h2 class="text-danger">{{ taux_retard }}%</h2><p>des emprunts sont en retard</p></div></div></div></div>
+<h3 class="mt-4">Retards par étudiant</h3><table class="table"><thead><tr><th>Étudiant</th><th>INE</th><th>Nombre de retards</th></tr></thead><tbody>{% for r in retards_par_etudiant %}<tr><td>{{ r.etudiant__first_name }} {{ r.etudiant__last_name }}</td><td>{{ r.etudiant__ine|default:"-" }}</td><td>{{ r.total }}</td></tr>{% endfor %}</tbody></table>
+{% endblock %}

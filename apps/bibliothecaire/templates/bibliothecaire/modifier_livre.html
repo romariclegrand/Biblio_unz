@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning">✏️ Modifier le livre</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3"><label>Titre *</label><input type="text" name="titre" class="form-control" value="{{ livre.titre }}" required></div>
+                    <div class="mb-3"><label>Auteur *</label><input type="text" name="auteur" class="form-control" value="{{ livre.auteur }}" required></div>
+                    <div class="mb-3"><label>ISBN *</label><input type="text" name="isbn" class="form-control" value="{{ livre.isbn }}" required></div>
+                    <div class="mb-3"><label>Catégorie</label><select name="categorie" class="form-select"><option value="">--</option>{% for c in categories %}<option value="{{ c.id }}" {% if livre.categorie.id == c.id %}selected{% endif %}>{{ c.nom }}</option>{% endfor %}</select></div>
+                    <div class="mb-3"><label>Nombre d'exemplaires</label><input type="number" name="nombre_exemplaires" class="form-control" value="{{ livre.nombre_exemplaires }}"></div>
+                    <div class="mb-3"><label>Rayon</label><input type="text" name="rayon" class="form-control" value="{{ livre.rayon }}"></div>
+                    <button class="btn btn-primary w-100">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

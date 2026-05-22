@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>📖 Mes emprunts</h2>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Ouvrage</th><th>Date emprunt</th><th>Retour prévu</th><th>Statut</th></tr>
+    </thead>
+    <tbody>
+        {% for e in emprunts %}
+        <tr class="{% if e.statut == 'en_retard' %}table-danger{% endif %}">
+            <td>{{ e.ouvrage.titre }}</td>
+            <td>{{ e.date_emprunt|date:"d/m/Y" }}</td>
+            <td>{{ e.date_retour_prevue|date:"d/m/Y" }}</td>
+            <td>
+                {% if e.statut == 'retourne' %}✅ Retourné
+                {% elif e.statut == 'en_retard' %}⚠️ En retard
+                {% else %}🟢 En cours{% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Aucun emprunt</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

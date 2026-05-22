@@ -17,18 +17,25 @@ class ConnexionView(View):
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         
-        if user is not None:
+        if user:
             login(request, user)
             messages.success(request, f'Bienvenue {user.username} !')
-            return redirect('users:dashboard')
+            
+            # Rediriger vers le bon dashboard selon le rôle
+            if user.role == 'administrateur':
+                return redirect('administrateur:dashboard')
+            elif user.role == 'bibliothecaire':
+                return redirect('bibliothecaire:dashboard')
+            else:
+                return redirect('users:dashboard_etudiant')
         else:
-            messages.error(request, 'Nom d\'utilisateur ou mot de passe incorrect.')
+            messages.error(request, 'Identifiants incorrects.')
             return render(request, 'users/login.html')
 
 class DeconnexionView(View):
     def get(self, request):
         logout(request)
-        messages.info(request, 'Vous avez été déconnecté.')
+        messages.info(request, 'Déconnecté.')
         return redirect('users:login')
 
 class InscriptionView(View):
@@ -42,13 +49,22 @@ class InscriptionView(View):
         password2 = request.POST.get('password2')
         nom = request.POST.get('nom')
         prenom = request.POST.get('prenom')
+        ine = request.POST.get('ine')
         
         if password != password2:
             messages.error(request, 'Les mots de passe ne correspondent pas.')
             return render(request, 'users/register.html')
         
         if Utilisateur.objects.filter(username=username).exists():
-            messages.error(request, 'Ce nom d\'utilisateur existe déjà.')
+            messages.error(request, 'Nom d\'utilisateur déjà pris.')
+            return render(request, 'users/register.html')
+        
+        if Utilisateur.objects.filter(ine=ine).exists():
+            messages.error(request, 'Cet INE est déjà associé à un compte.')
+            return render(request, 'users/register.html')
+        
+        if len(ine) != 12:
+            messages.error(request, "L'INE doit contenir exactement 12 caractères.")
             return render(request, 'users/register.html')
         
         user = Utilisateur.objects.create_user(
@@ -57,26 +73,23 @@ class InscriptionView(View):
             password=password,
             first_name=nom,
             last_name=prenom,
+            ine=ine,
             role='etudiant'
         )
         
         login(request, user)
         messages.success(request, 'Inscription réussie !')
-        return redirect('users:dashboard')
+        return redirect('users:dashboard_etudiant')
+
+class DashboardEtudiantView(LoginRequiredMixin, View):
+    def get(self, request):
+        if request.user.role != 'etudiant':
+            if request.user.role == 'bibliothecaire':
+                return redirect('bibliothecaire:dashboard')
+            elif request.user.role == 'administrateur':
+                return redirect('administrateur:dashboard')
+        return render(request, 'users/dashboard_etudiant.html', {'user': request.user})
 
 class ProfilView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'users/profil.html', {'user': request.user})
-
-class DashboardView(LoginRequiredMixin, View):
-    def get(self, request):
-        context = {'user': request.user}
-        
-        if request.user.role == 'etudiant':
-            return render(request, 'users/dashboard_etudiant.html', context)
-        elif request.user.role == 'bibliothecaire':
-            return render(request, 'users/dashboard_bibliothecaire.html', context)
-        elif request.user.role == 'administrateur':
-            return render(request, 'users/dashboard_administrateur.html', context)
-        
-        return render(request, 'users/dashboard.html', context)

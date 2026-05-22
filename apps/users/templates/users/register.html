@@ -1,49 +1,48 @@
 {% extends 'base.html' %}
 
-{% block title %}Inscription - Biblio_UNZ{% endblock %}
-
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Inscription</h4>
+                <h4 class="mb-0">Inscription Étudiant</h4>
             </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="nom" class="form-label">Nom</label>
-                            <input type="text" name="nom" id="nom" class="form-control" required>
+                            <label>Nom</label>
+                            <input type="text" name="nom" class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="prenom" class="form-label">Prénom</label>
-                            <input type="text" name="prenom" id="prenom" class="form-control" required>
+                            <label>Prénom</label>
+                            <input type="text" name="prenom" class="form-control" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="username" class="form-label">Nom d'utilisateur</label>
-                        <input type="text" name="username" id="username" class="form-control" required>
+                        <label>Nom d'utilisateur</label>
+                        <input type="text" name="username" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" name="email" id="email" class="form-control" required>
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Mot de passe</label>
-                        <input type="password" name="password" id="password" class="form-control" required>
+                        <label>INE (12 caractères)</label>
+                        <input type="text" name="ine" class="form-control" maxlength="12" pattern="[A-Za-z0-9]{12}" required>
+                        <small class="text-muted">Exemple: 2024INFO12345</small>
                     </div>
                     <div class="mb-3">
-                        <label for="password2" class="form-label">Confirmer le mot de passe</label>
-                        <input type="password" name="password2" id="password2" class="form-control" required>
+                        <label>Mot de passe</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Confirmer le mot de passe</label>
+                        <input type="password" name="password2" class="form-control" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
                 </form>
-                <hr>
-                <p class="text-center mb-0">
-                    Déjà inscrit ? <a href="{% url 'users:login' %}">Connectez-vous</a>
-                </p>
             </div>
         </div>
     </div>

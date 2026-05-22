@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>⚙️ Panneau Administrateur</h2>
+<div class="row mt-4">
+    <div class="col-md-3"><div class="card bg-info text-white p-3"><h4>{{ stats.etudiants }}</h4>Étudiants</div></div>
+    <div class="col-md-3"><div class="card bg-secondary text-white p-3"><h4>{{ stats.bibliothecaires }}</h4>Bibliothécaires</div></div>
+    <div class="col-md-3"><div class="card bg-primary text-white p-3"><h4>{{ stats.livres }}</h4>Livres</div></div>
+    <div class="col-md-3"><div class="card bg-warning text-white p-3"><h4>{{ stats.emprunts }}</h4>Emprunts</div></div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-6"><div class="card"><div class="card-header bg-dark text-white">👥 Gestion des utilisateurs</div><div class="card-body"><a href="{% url 'administrateur:gerer_utilisateurs' %}" class="btn btn-primary">Gérer</a></div></div></div>
+    <div class="col-md-6"><div class="card"><div class="card-header bg-dark text-white">📊 Rapports et statistiques</div><div class="card-body"><a href="{% url 'administrateur:statistiques' %}" class="btn btn-success">Voir</a> <a href="{% url 'administrateur:exporter' 'csv' %}" class="btn btn-info">Exporter CSV</a></div></div></div>
+</div>
+{% endblock %}

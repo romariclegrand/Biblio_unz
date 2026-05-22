@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>📋 Gestion des emprunts</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row">
+            <div class="col-md-3"><label>Filtrer par statut</label><select name="statut" class="form-select" onchange="this.form.submit()"><option value="">Tous</option><option value="en_cours" {% if statut_filtre == 'en_cours' %}selected{% endif %}>En cours</option><option value="en_retard" {% if statut_filtre == 'en_retard' %}selected{% endif %}>En retard</option><option value="retourne" {% if statut_filtre == 'retourne' %}selected{% endif %}>Retourné</option></select></div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead class="table-dark"><tr><th>Étudiant</th><th>INE</th><th>Livre</th><th>Emprunt</th><th>Retour prévu</th><th>Statut</th><th>Actions</th></tr></thead>
+    <tbody>
+        {% for e in emprunts %}
+        <tr class="{% if e.statut == 'en_retard' %}table-danger{% endif %}">
+            <td>{{ e.etudiant.get_full_name }}<br><small>{{ e.etudiant.email }}</small></td>
+            <td>{{ e.etudiant.ine|default:"-" }}</td>
+            <td>{{ e.ouvrage.titre }}</td>
+            <td>{{ e.date_emprunt|date:"d/m/Y" }}</td>
+            <td>{{ e.date_retour_prevue|date:"d/m/Y" }}</td>
+            <td>{% if e.statut == 'retourne' %}✅ Retourné{% elif e.statut == 'en_retard' %}⚠️ En retard{% else %}🟢 En cours{% endif %}</td>
+            <td>
+                {% if e.statut != 'retourne' %}<form method="post" action="{% url 'bibliothecaire:enregistrer_retour' e.id %}" style="display:inline">{% csrf_token %}<button class="btn btn-sm btn-success">Retour</button></form>{% endif %}
+                {% if e.statut == 'en_retard' %}<form method="post" action="{% url 'bibliothecaire:envoyer_rappel' e.id %}" style="display:inline">{% csrf_token %}<button class="btn btn-sm btn-warning">Rappel</button></form>{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

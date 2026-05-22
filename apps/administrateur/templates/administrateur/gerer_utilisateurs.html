@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-4"><h2>👥 Utilisateurs</h2><a href="{% url 'administrateur:ajouter_utilisateur' %}" class="btn btn-success">+ Ajouter</a></div>
+<table class="table table-striped">
+    <thead class="table-dark"><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>INE</th><th>Statut</th><th>Actions</th></tr></thead>
+    <tbody>{% for u in utilisateurs %}<tr><td>{{ u.get_full_name }}<br><small>{{ u.username }}</small></td><td>{{ u.email }}</td><td>{{ u.get_role_display }}</td><td>{{ u.ine|default:"-" }}</td><td>{% if u.is_active %}✅ Actif{% else %}❌ Inactif{% endif %}</td><td><a href="{% url 'administrateur:modifier_utilisateur' u.id %}" class="btn btn-sm btn-primary">✏️</a><form method="post" action="{% url 'administrateur:desactiver_utilisateur' u.id %}" style="display:inline">{% csrf_token %}<button class="btn btn-sm btn-warning">🔘</button></form></td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

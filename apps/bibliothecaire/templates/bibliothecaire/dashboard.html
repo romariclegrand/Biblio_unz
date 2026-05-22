@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📚 Panneau Bibliothécaire</h2>
+    <span class="badge bg-primary">{{ user.get_full_name }}</span>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3"><div class="card bg-primary text-white p-3"><h4>{{ stats.total_livres }}</h4>Total Livres</div></div>
+    <div class="col-md-3"><div class="card bg-success text-white p-3"><h4>{{ stats.livres_disponibles }}</h4>Disponibles</div></div>
+    <div class="col-md-3"><div class="card bg-warning text-white p-3"><h4>{{ stats.emprunts_en_cours }}</h4>Emprunts en cours</div></div>
+    <div class="col-md-3"><div class="card bg-danger text-white p-3"><h4>{{ stats.emprunts_retard }}</h4>En retard</div></div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-dark text-white">📖 Gestion du catalogue</div>
+            <div class="card-body">
+                <a href="{% url 'bibliothecaire:gerer_catalogue' %}" class="btn btn-primary">Gérer les livres</a>
+                <a href="{% url 'bibliothecaire:ajouter_livre' %}" class="btn btn-success">+ Ajouter un livre</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-dark text-white">📋 Suivi des emprunts</div>
+            <div class="card-body">
+                <a href="{% url 'bibliothecaire:gerer_emprunts' %}" class="btn btn-warning">Voir tous les emprunts</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
