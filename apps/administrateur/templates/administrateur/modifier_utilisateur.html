@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier un utilisateur - Biblio_UNZ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h4 class="mb-0">✏️ Modifier l'utilisateur</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nom</label>
+                            <input type="text" name="last_name" class="form-control" value="{{ utilisateur.last_name }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Prénom</label>
+                            <input type="text" name="first_name" class="form-control" value="{{ utilisateur.first_name }}" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nom d'utilisateur</label>
+                        <input type="text" name="username" class="form-control" value="{{ utilisateur.username }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ utilisateur.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rôle</label>
+                        <select name="role" class="form-select">
+                            <option value="etudiant" {% if utilisateur.role == 'etudiant' %}selected{% endif %}>Étudiant</option>
+                            <option value="bibliothecaire" {% if utilisateur.role == 'bibliothecaire' %}selected{% endif %}>Bibliothécaire</option>
+                            <option value="administrateur" {% if utilisateur.role == 'administrateur' %}selected{% endif %}>Administrateur</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">INE</label>
+                        <input type="text" name="ine" class="form-control" value="{{ utilisateur.ine|default:'' }}" maxlength="12">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="is_active" class="form-check-input" {% if utilisateur.is_active %}checked{% endif %}>
+                        <label class="form-check-label">Compte actif</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

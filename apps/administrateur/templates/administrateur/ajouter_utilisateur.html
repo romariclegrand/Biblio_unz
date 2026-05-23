@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Ajouter un utilisateur - Biblio_UNZ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">➕ Ajouter un utilisateur</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nom</label>
+                            <input type="text" name="first_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Prénom</label>
+                            <input type="text" name="last_name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nom d'utilisateur</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rôle</label>
+                        <select name="role" class="form-select" required>
+                            <option value="etudiant">Étudiant</option>
+                            <option value="bibliothecaire">Bibliothécaire</option>
+                            <option value="administrateur">Administrateur</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">INE (pour étudiant)</label>
+                        <input type="text" name="ine" class="form-control" maxlength="12">
+                        <small class="text-muted">12 caractères obligatoires pour les étudiants</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Créer l'utilisateur</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
