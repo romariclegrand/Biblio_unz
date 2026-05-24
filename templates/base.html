@@ -22,7 +22,12 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link" href="/books/">📚 Catalogue</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/loans/mes-emprunts/">📖 Mes emprunts</a></li>
+                        
+                        {# Afficher "Mes emprunts" et "Mes réservations" uniquement pour les étudiants #}
+                        {% if user.role == 'etudiant' %}
+                            <li class="nav-item"><a class="nav-link" href="/loans/mes-emprunts/">📖 Mes emprunts</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/loans/mes-reservations/">📝 Mes réservations</a></li>
+                        {% endif %}
                         
                         {% if user.role == 'bibliothecaire' %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'bibliothecaire:dashboard' %}">📋 Biblio</a></li>

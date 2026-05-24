@@ -3,7 +3,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>📚 Panneau Bibliothécaire</h2>
-    <span class="badge bg-primary">{{ user.get_full_name }}</span>
+    <span class="badge bg-primary">{{ user.get_full_name|default:user.username }}</span>
 </div>
 
 <div class="row mb-4">
@@ -14,22 +14,58 @@
 </div>
 
 <div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-dark text-white">📖 Gestion du catalogue</div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
             <div class="card-body">
+                <h5 class="card-title">📖 Gestion du catalogue</h5>
+                <p class="card-text">Ajouter, modifier ou supprimer des ouvrages</p>
                 <a href="{% url 'bibliothecaire:gerer_catalogue' %}" class="btn btn-primary">Gérer les livres</a>
-                <a href="{% url 'bibliothecaire:ajouter_livre' %}" class="btn btn-success">+ Ajouter un livre</a>
+                <a href="{% url 'bibliothecaire:ajouter_livre' %}" class="btn btn-success mt-2">+ Ajouter un livre</a>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-dark text-white">📋 Suivi des emprunts</div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
             <div class="card-body">
+                <h5 class="card-title">📋 Suivi des emprunts</h5>
+                <p class="card-text">Voir tous les emprunts, retours et rappels</p>
                 <a href="{% url 'bibliothecaire:gerer_emprunts' %}" class="btn btn-warning">Voir tous les emprunts</a>
             </div>
         </div>
     </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">📝 Réservations</h5>
+                <p class="card-text">Gérer les réservations et la file d'attente</p>
+                <a href="{% url 'bibliothecaire:gerer_reservations' %}" class="btn btn-info">Voir les réservations</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">💰 Gestion des pénalités</h5>
+                <p class="card-text">Consulter, payer ou annuler les pénalités</p>
+                <a href="{% url 'bibliothecaire:gerer_penalites' %}" class="btn btn-danger">Gérer les pénalités</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">📊 Statistiques</h5>
+                <p class="card-text">Voir les statistiques de la bibliothèque</p>
+                <a href="{% url 'administrateur:statistiques' %}" class="btn btn-secondary">Voir les stats</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4 text-center">
+    <a href="{% url 'users:logout' %}" class="btn btn-secondary">🚪 Déconnexion</a>
 </div>
 {% endblock %}

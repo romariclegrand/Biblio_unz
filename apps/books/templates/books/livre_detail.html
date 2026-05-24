@@ -8,20 +8,25 @@
     <div class="card-body">
         <p><strong>Auteur:</strong> {{ livre.auteur }}</p>
         <p><strong>ISBN:</strong> {{ livre.isbn }}</p>
+        <p><strong>Catégorie:</strong> {{ livre.categorie.nom|default:"Non catégorisé" }}</p>
         <p><strong>Disponibles:</strong> {{ livre.nombre_disponibles }}/{{ livre.nombre_exemplaires }}</p>
         
         {% if user.is_authenticated and user.role == 'etudiant' %}
             {% if livre.nombre_disponibles > 0 %}
-            <form method="post" action="{% url 'loans:emprunter' livre.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success">📚 Emprunter</button>
-            </form>
+                <form method="post" action="{% url 'loans:emprunter' livre.id %}" style="display:inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">📚 Emprunter</button>
+                </form>
             {% else %}
-            <button class="btn btn-secondary" disabled>Indisponible</button>
+                <form method="post" action="{% url 'loans:reserver' livre.id %}" style="display:inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning">📝 Réserver</button>
+                </form>
+                <small class="text-muted ms-2">Tous les exemplaires sont empruntés</small>
             {% endif %}
         {% endif %}
         
-        <a href="{% url 'books:catalogue' %}" class="btn btn-link">← Retour</a>
+        <a href="{% url 'books:catalogue' %}" class="btn btn-secondary">← Retour au catalogue</a>
     </div>
 </div>
 {% endblock %}

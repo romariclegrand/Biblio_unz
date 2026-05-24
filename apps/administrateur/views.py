@@ -4,11 +4,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponse
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from datetime import timedelta
 import csv
 from apps.users.models import Utilisateur
 from apps.books.models import Ouvrage
 from apps.loans.models import Emprunt
+
+User = get_user_model()
 
 # ==================== DASHBOARD ====================
 class DashboardAdminView(LoginRequiredMixin, View):
@@ -53,6 +56,8 @@ class AjouterUtilisateurView(LoginRequiredMixin, View):
         email = request.POST.get('email')
         password = request.POST.get('password')
         role = request.POST.get('role')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
         ine = request.POST.get('ine')
         
         if Utilisateur.objects.filter(username=username).exists():
@@ -63,6 +68,8 @@ class AjouterUtilisateurView(LoginRequiredMixin, View):
             username=username,
             email=email,
             password=password,
+            first_name=first_name,
+            last_name=last_name,
             role=role,
             ine=ine if role == 'etudiant' else None
         )
@@ -85,6 +92,8 @@ class ModifierUtilisateurView(LoginRequiredMixin, View):
         user.username = request.POST.get('username')
         user.email = request.POST.get('email')
         user.role = request.POST.get('role')
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
         user.is_active = request.POST.get('is_active') == 'on'
         if request.POST.get('ine'):
             user.ine = request.POST.get('ine')
@@ -115,6 +124,7 @@ class StatistiquesView(LoginRequiredMixin, View):
         return super().dispatch(request, *args, **kwargs)
     
     def get(self, request):
+        from django.db import models
         periode = request.GET.get('periode', 'mois')
         
         if periode == 'semaine':
@@ -130,15 +140,12 @@ class StatistiquesView(LoginRequiredMixin, View):
         
         emprunts_periode = Emprunt.objects.filter(date_emprunt__gte=date_debut)
         
-        # Top des livres
         top_livres = emprunts_periode.values('ouvrage__titre').annotate(total=models.Count('id')).order_by('-total')[:10]
         
-        # Taux de retard
         total_emprunts = emprunts_periode.count()
         retards = emprunts_periode.filter(statut='en_retard').count()
         taux_retard = (retards / total_emprunts * 100) if total_emprunts > 0 else 0
         
-        # Retard par étudiant
         retards_par_etudiant = emprunts_periode.filter(statut='en_retard').values('etudiant__first_name', 'etudiant__last_name', 'etudiant__ine').annotate(total=models.Count('id')).order_by('-total')
         
         context = {
@@ -174,3 +181,79 @@ class ExporterRapportView(LoginRequiredMixin, View):
             ])
         
         return response
+
+# ==================== GESTION DES LOGS ====================
+class ConsulterLogsView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != 'administrateur':
+            messages.error(request, "Accès réservé aux administrateurs.")
+            return redirect('users:dashboard')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request):
+        from apps.statistics.models import LogActivite
+        from django.db.models import Q
+        
+        logs = LogActivite.objects.all()
+        
+        utilisateur_id = request.GET.get('utilisateur')
+        action = request.GET.get('action')
+        date_debut = request.GET.get('date_debut')
+        date_fin = request.GET.get('date_fin')
+        
+        if utilisateur_id:
+            logs = logs.filter(utilisateur_id=utilisateur_id)
+        if action:
+            logs = logs.filter(action=action)
+        if date_debut:
+            logs = logs.filter(date_action__date__gte=date_debut)
+        if date_fin:
+            logs = logs.filter(date_action__date__lte=date_fin)
+        
+        utilisateurs = Utilisateur.objects.all()
+        
+        context = {
+            'logs': logs,
+            'utilisateurs': utilisateurs,
+            'filtre_utilisateur': utilisateur_id,
+            'filtre_action': action,
+            'filtre_date_debut': date_debut,
+            'filtre_date_fin': date_fin,
+            'actions': LogActivite.ACTION_CHOICES,
+        }
+        return render(request, 'administrateur/logs.html', context)
+
+# ==================== CONFIGURATION DU SYSTÈME ====================
+from apps.statistics.models import ConfigurationSysteme
+
+class ConfigurerSystemeView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != 'administrateur':
+            messages.error(request, "Accès réservé aux administrateurs.")
+            return redirect('users:dashboard')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request):
+        config = ConfigurationSysteme.get_config()
+        return render(request, 'administrateur/configurer_systeme.html', {'config': config})
+    
+    def post(self, request):
+        config = ConfigurationSysteme.get_config()
+        
+        duree = request.POST.get('duree_emprunt_jours')
+        tarif = request.POST.get('tarif_penalite_journalier')
+        
+        if duree:
+            config.duree_emprunt_jours = int(duree)
+        if tarif:
+            config.tarif_penalite_journalier = int(tarif)
+        
+        config.modifie_par = request.user
+        config.save()
+        
+        # Mettre à jour la variable dans les signaux pour usage immédiat
+        from apps.loans.signals import update_config
+        update_config(config.duree_emprunt_jours, config.tarif_penalite_journalier)
+        
+        messages.success(request, "Configuration mise à jour avec succès !")
+        return redirect('administrateur:configurer_systeme')

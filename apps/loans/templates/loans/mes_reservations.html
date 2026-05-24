@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>📋 Mes réservations</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr><th>Ouvrage</th><th>Date réservation</th><th>Expiration</th><th>Statut</th></tr>
+        </thead>
+        <tbody>
+            {% for r in reservations %}
+            <tr class="{% if r.statut == 'expiree' %}table-danger{% endif %}">
+                <td>{{ r.ouvrage.titre }}<br><small>{{ r.ouvrage.auteur }}</small></td>
+                <td>{{ r.date_reservation|date:"d/m/Y H:i" }}</td>
+                <td>{{ r.date_expiration|date:"d/m/Y H:i" }}</td>
+                <td>
+                    {% if r.statut == 'en_attente' %}
+                        <span class="badge bg-warning">⏳ En attente</span>
+                    {% elif r.statut == 'notifie' %}
+                        <span class="badge bg-success">✅ Notifié - Livre disponible</span>
+                    {% elif r.statut == 'expiree' %}
+                        <span class="badge bg-danger">⏰ Expirée</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Annulée</span>
+                    {% endif %}
+                 </td>
+             </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center">Aucune réservation en cours</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

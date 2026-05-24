@@ -202,3 +202,133 @@ class EnvoyerRappelView(LoginRequiredMixin, View):
         except:
             messages.error(request, "Erreur lors de l'envoi")
         return redirect('bibliothecaire:gerer_emprunts')
+
+# ==================== GESTION DES PÉNALITÉS ====================
+from django.http import HttpResponse
+import csv
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from io import BytesIO
+from apps.loans.models import Penalite
+
+class GererPenalitesView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != 'bibliothecaire':
+            messages.error(request, "Accès réservé aux bibliothécaires.")
+            return redirect('users:dashboard')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request):
+        penalites = Penalite.objects.all()
+        statut_filtre = request.GET.get('statut', '')
+        if statut_filtre:
+            penalites = penalites.filter(statut=statut_filtre)
+        
+        return render(request, 'bibliothecaire/gerer_penalites.html', {
+            'penalites': penalites,
+            'statut_filtre': statut_filtre
+        })
+
+class AnnulerPenaliteView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != 'bibliothecaire':
+            messages.error(request, "Accès réservé aux bibliothécaires.")
+            return redirect('users:dashboard')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def post(self, request, penalite_id):
+        penalite = get_object_or_404(Penalite, id=penalite_id)
+        motif = request.POST.get('motif')
+        
+        if not motif:
+            messages.error(request, "Un motif est obligatoire pour annuler une pénalité.")
+            return redirect('bibliothecaire:gerer_penalites')
+        
+        penalite.statut = 'annulee'
+        penalite.motif_annulation = motif
+        penalite.save()
+        
+        messages.success(request, f"Pénalité annulée : {motif}")
+        return redirect('bibliothecaire:gerer_penalites')
+
+class MarquerPenalitePayeeView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != 'bibliothecaire':
+            messages.error(request, "Accès réservé aux bibliothécaires.")
+            return redirect('users:dashboard')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def post(self, request, penalite_id):
+        penalite = get_object_or_404(Penalite, id=penalite_id)
+        penalite.statut = 'payee'
+        penalite.save()
+        
+        messages.success(request, f"Pénalité de {penalite.montant} FCFA marquée comme payée.")
+        return redirect('bibliothecaire:gerer_penalites')
+
+class ExporterPenalitesView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != 'bibliothecaire':
+            messages.error(request, "Accès réservé aux bibliothécaires.")
+            return redirect('users:dashboard')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request, format_type):
+        penalites = Penalite.objects.all()
+        
+        if format_type == 'csv':
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="penalites_{timezone.now().date()}.csv"'
+            writer = csv.writer(response)
+            writer.writerow(['Étudiant', 'INE', 'Livre', 'Jours retard', 'Montant', 'Statut', 'Date'])
+            for p in penalites:
+                writer.writerow([
+                    p.emprunt.etudiant.get_full_name(),
+                    p.emprunt.etudiant.ine or '-',
+                    p.emprunt.ouvrage.titre,
+                    p.jours_retard,
+                    p.montant,
+                    p.statut,
+                    p.date_calcul.strftime('%d/%m/%Y')
+                ])
+            return response
+        
+        elif format_type == 'pdf':
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="penalites_{timezone.now().date()}.pdf"'
+            
+            buffer = BytesIO()
+            p = canvas.Canvas(buffer, pagesize=letter)
+            y = 750
+            
+            p.drawString(50, y, "Rapport des pénalités")
+            y -= 30
+            
+            for penalite in penalites:
+                p.drawString(50, y, f"{penalite.emprunt.etudiant.get_full_name()} - {penalite.montant} FCFA - {penalite.statut}")
+                y -= 20
+                if y < 50:
+                    p.showPage()
+                    y = 750
+            
+            p.save()
+            pdf = buffer.getvalue()
+            buffer.close()
+            response.write(pdf)
+            return response
+        
+        return redirect('bibliothecaire:gerer_penalites')
+
+# ==================== GESTION DES RÉSERVATIONS ====================
+from apps.loans.models import Reservation
+
+class GererReservationsView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != 'bibliothecaire':
+            messages.error(request, "Accès réservé aux bibliothécaires.")
+            return redirect('users:dashboard')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request):
+        reservations = Reservation.objects.filter(statut='en_attente').order_by('date_reservation')
+        return render(request, 'bibliothecaire/gerer_reservations.html', {'reservations': reservations})

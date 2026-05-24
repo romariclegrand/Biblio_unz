@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestion des pénalités - Biblio_UNZ{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>💰 Gestion des pénalités</h2>
+    <div>
+        <a href="{% url 'bibliothecaire:exporter_penalites' 'csv' %}" class="btn btn-success">📊 Exporter CSV</a>
+        <a href="{% url 'bibliothecaire:exporter_penalites' 'pdf' %}" class="btn btn-danger">📄 Exporter PDF</a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white">Filtres</div>
+    <div class="card-body">
+        <form method="get" class="row">
+            <div class="col-md-3">
+                <label>Statut</label>
+                <select name="statut" class="form-select" onchange="this.form.submit()">
+                    <option value="">Tous</option>
+                    <option value="active" {% if statut_filtre == 'active' %}selected{% endif %}>Active</option>
+                    <option value="payee" {% if statut_filtre == 'payee' %}selected{% endif %}>Payée</option>
+                    <option value="annulee" {% if statut_filtre == 'annulee' %}selected{% endif %}>Annulée</option>
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Étudiant</th><th>INE</th><th>Livre</th><th>Jours retard</th><th>Montant (FCFA)</th><th>Date calcul</th><th>Statut</th><th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in penalites %}
+            <tr class="{% if p.statut == 'active' %}table-danger{% endif %}">
+                <td>{{ p.emprunt.etudiant.get_full_name }}<br><small>{{ p.emprunt.etudiant.email }}</small></td>
+                <td>{{ p.emprunt.etudiant.ine|default:"-" }}</td>
+                <td>{{ p.emprunt.ouvrage.titre }}</td>
+                <td>{{ p.jours_retard }}</td>
+                <td>{{ p.montant }}</td>
+                <td>{{ p.date_calcul|date:"d/m/Y" }}</td>
+                <td>
+                    {% if p.statut == 'active' %}
+                        <span class="badge bg-danger">Active</span>
+                    {% elif p.statut == 'payee' %}
+                        <span class="badge bg-success">Payée</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Annulée</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if p.statut == 'active' %}
+                        <form method="post" action="{% url 'bibliothecaire:payer_penalite' p.id %}" style="display:inline">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-success">💰 Payer</button>
+                        </form>
+                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalAnnuler{{ p.id }}">❌ Annuler</button>
+                        
+                        <div class="modal fade" id="modalAnnuler{{ p.id }}">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form method="post" action="{% url 'bibliothecaire:annuler_penalite' p.id %}">
+                                        {% csrf_token %}
+                                        <div class="modal-header bg-danger text-white">
+                                            <h5 class="modal-title">Annuler la pénalité</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <label>Motif d'annulation (obligatoire)</label>
+                                            <textarea name="motif" class="form-control" rows="3" required></textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                            <button type="submit" class="btn btn-danger">Confirmer l'annulation</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% elif p.statut == 'annulee' %}
+                        <small class="text-muted">Motif: {{ p.motif_annulation|truncatechars:50 }}</small>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" class="text-center">Aucune pénalité trouvée</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'bibliothecaire:dashboard' %}" class="btn btn-secondary">← Retour au dashboard</a>
+</div>
+{% endblock %}

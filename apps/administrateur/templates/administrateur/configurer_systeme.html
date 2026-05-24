@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Configuration du système - Biblio_UNZ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">⚙️ Configuration du système</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">📖 Durée d'emprunt par défaut</label>
+                        <div class="input-group">
+                            <input type="number" name="duree_emprunt_jours" class="form-control form-control-lg" 
+                                   value="{{ config.duree_emprunt_jours }}" min="1" max="30" required>
+                            <span class="input-group-text">jours</span>
+                        </div>
+                        <small class="text-muted">Durée maximum qu'un étudiant peut garder un livre</small>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">💰 Tarif journalier de pénalité</label>
+                        <div class="input-group">
+                            <input type="number" name="tarif_penalite_journalier" class="form-control form-control-lg" 
+                                   value="{{ config.tarif_penalite_journalier }}" min="0" max="1000" step="50" required>
+                            <span class="input-group-text">FCFA/jour</span>
+                        </div>
+                        <small class="text-muted">Montant facturé par jour de retard</small>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Valeurs actuelles :</strong><br>
+                        - Durée d'emprunt : <strong>{{ config.duree_emprunt_jours }} jours</strong><br>
+                        - Pénalité : <strong>{{ config.tarif_penalite_journalier }} FCFA/jour</strong><br>
+                        <small>Dernière modification : {{ config.date_modification|date:"d/m/Y H:i" }}</small>
+                        {% if config.modifie_par %}
+                            <br><small>Par : {{ config.modifie_par.get_full_name|default:config.modifie_par.username }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save"></i> Enregistrer les modifications
+                        </button>
+                        <a href="{% url 'administrateur:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour au dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">📌 Informations</h5>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>Les modifications sont appliquées <strong>immédiatement</strong> sans redémarrage</li>
+                    <li>Les nouveaux emprunts utiliseront la nouvelle durée</li>
+                    <li>Les pénalités calculées après modification utiliseront le nouveau tarif</li>
+                    <li>Les emprunts déjà en cours conservent leur date de retour initiale</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
