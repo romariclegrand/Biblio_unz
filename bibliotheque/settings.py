@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'apps.statistics',
     'apps.bibliothecaire',
     'apps.administrateur',
+    'apps.core',  # Ajout de l'application core
 ]
 
 MIDDLEWARE = [

@@ -22,6 +22,7 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link" href="/books/">📚 Catalogue</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/apropos/">ℹ️ À propos</a></li>
                         
                         {# Afficher "Mes emprunts" et "Mes réservations" uniquement pour les étudiants #}
                         {% if user.role == 'etudiant' %}

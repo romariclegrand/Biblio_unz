@@ -5,8 +5,10 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
+from django.http import HttpResponse
+import csv
 from apps.books.models import Ouvrage, Categorie, HistoriqueOuvrage
-from apps.loans.models import Emprunt
+from apps.loans.models import Emprunt, Penalite, Reservation
 from apps.users.models import Utilisateur
 
 # ==================== DASHBOARD ====================
@@ -51,11 +53,13 @@ class AjouterLivreView(LoginRequiredMixin, View):
         titre = request.POST.get('titre')
         auteur = request.POST.get('auteur')
         isbn = request.POST.get('isbn')
+        categorie_nom = request.POST.get('categorie_nouvelle')
         categorie_id = request.POST.get('categorie')
-        nombre_exemplaires = request.POST.get('nombre_exemplaires')
+        maison_edition = request.POST.get('maison_edition')
+        annee_edition = request.POST.get('annee_edition')
+        nombre_exemplaires = request.POST.get('nombre_exemplaires', 1)
         rayon = request.POST.get('rayon')
         
-        # Validation
         if not titre or not auteur or not isbn:
             messages.error(request, "Titre, auteur et ISBN sont obligatoires.")
             return redirect('bibliothecaire:ajouter_livre')
@@ -64,17 +68,25 @@ class AjouterLivreView(LoginRequiredMixin, View):
             messages.error(request, "Cet ISBN existe déjà.")
             return redirect('bibliothecaire:ajouter_livre')
         
+        # Gestion de la catégorie
+        categorie = None
+        if categorie_nom:
+            categorie, created = Categorie.objects.get_or_create(nom=categorie_nom)
+        elif categorie_id:
+            categorie = get_object_or_404(Categorie, id=categorie_id)
+        
         livre = Ouvrage.objects.create(
             titre=titre,
             auteur=auteur,
             isbn=isbn,
-            categorie_id=categorie_id if categorie_id else None,
+            categorie=categorie,
+            maison_edition=maison_edition,
+            annee_edition=annee_edition if annee_edition else None,
             nombre_exemplaires=int(nombre_exemplaires),
             nombre_disponibles=int(nombre_exemplaires),
             rayon=rayon
         )
         
-        # Historique
         HistoriqueOuvrage.objects.create(
             ouvrage=livre,
             utilisateur=request.user,
@@ -103,11 +115,23 @@ class ModifierLivreView(LoginRequiredMixin, View):
         livre.titre = request.POST.get('titre')
         livre.auteur = request.POST.get('auteur')
         livre.isbn = request.POST.get('isbn')
-        livre.categorie_id = request.POST.get('categorie')
+        
+        categorie_nom = request.POST.get('categorie_nouvelle')
+        categorie_id = request.POST.get('categorie')
+        
+        if categorie_nom:
+            categorie, _ = Categorie.objects.get_or_create(nom=categorie_nom)
+            livre.categorie = categorie
+        elif categorie_id:
+            livre.categorie = get_object_or_404(Categorie, id=categorie_id)
+        else:
+            livre.categorie = None
+        
+        livre.maison_edition = request.POST.get('maison_edition')
+        livre.annee_edition = request.POST.get('annee_edition') if request.POST.get('annee_edition') else None
         livre.nombre_exemplaires = int(request.POST.get('nombre_exemplaires'))
         livre.rayon = request.POST.get('rayon')
         
-        # Ajuster le nombre de disponibles
         difference = livre.nombre_exemplaires - livre.nombre_disponibles
         if difference > 0:
             livre.nombre_disponibles += difference
@@ -133,7 +157,6 @@ class SupprimerLivreView(LoginRequiredMixin, View):
     def post(self, request, livre_id):
         livre = get_object_or_404(Ouvrage, id=livre_id)
         
-        # Vérifier si des exemplaires sont empruntés
         emprunts_actifs = Emprunt.objects.filter(ouvrage=livre, statut__in=['en_cours', 'en_retard']).exists()
         if emprunts_actifs:
             messages.error(request, "Impossible de supprimer : des exemplaires sont actuellement empruntés.")
@@ -193,7 +216,7 @@ class EnvoyerRappelView(LoginRequiredMixin, View):
         try:
             send_mail(
                 "Rappel de retour - Biblio_UNZ",
-                f"Bonjour {emprunt.etudiant.get_full_name()},\n\nLe livre '{emprunt.ouvrage.titre}' est en retard.\nMerci de le retourner rapidement.",
+                f"Bonjour {emprunt.etudiant.first_name},\n\nLe livre '{emprunt.ouvrage.titre}' est en retard.\nMerci de le retourner rapidement.",
                 settings.DEFAULT_FROM_EMAIL,
                 [emprunt.etudiant.email],
                 fail_silently=False,
@@ -203,14 +226,19 @@ class EnvoyerRappelView(LoginRequiredMixin, View):
             messages.error(request, "Erreur lors de l'envoi")
         return redirect('bibliothecaire:gerer_emprunts')
 
-# ==================== GESTION DES PÉNALITÉS ====================
-from django.http import HttpResponse
-import csv
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from io import BytesIO
-from apps.loans.models import Penalite
+# ==================== GESTION DES RÉSERVATIONS ====================
+class GererReservationsView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != 'bibliothecaire':
+            messages.error(request, "Accès réservé aux bibliothécaires.")
+            return redirect('users:dashboard')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request):
+        reservations = Reservation.objects.filter(statut='en_attente').order_by('date_reservation')
+        return render(request, 'bibliothecaire/gerer_reservations.html', {'reservations': reservations})
 
+# ==================== GESTION DES PÉNALITÉS ====================
 class GererPenalitesView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         if request.user.role != 'bibliothecaire':
@@ -274,6 +302,10 @@ class ExporterPenalitesView(LoginRequiredMixin, View):
         return super().dispatch(request, *args, **kwargs)
     
     def get(self, request, format_type):
+        from reportlab.lib.pagesizes import letter
+        from reportlab.pdfgen import canvas
+        from io import BytesIO
+        
         penalites = Penalite.objects.all()
         
         if format_type == 'csv':
@@ -318,17 +350,3 @@ class ExporterPenalitesView(LoginRequiredMixin, View):
             return response
         
         return redirect('bibliothecaire:gerer_penalites')
-
-# ==================== GESTION DES RÉSERVATIONS ====================
-from apps.loans.models import Reservation
-
-class GererReservationsView(LoginRequiredMixin, View):
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.role != 'bibliothecaire':
-            messages.error(request, "Accès réservé aux bibliothécaires.")
-            return redirect('users:dashboard')
-        return super().dispatch(request, *args, **kwargs)
-    
-    def get(self, request):
-        reservations = Reservation.objects.filter(statut='en_attente').order_by('date_reservation')
-        return render(request, 'bibliothecaire/gerer_reservations.html', {'reservations': reservations})

@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}À propos - Biblio_UNZ{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="text-center mb-5">
+            <i class="fas fa-book-open fa-4x text-primary mb-3"></i>
+            <h1 class="display-4">Biblio_UNZ</h1>
+            <p class="lead">Système de gestion de bibliothèque universitaire</p>
+            <hr class="w-50 mx-auto">
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-info-circle"></i> À propos du projet</h4>
+            </div>
+            <div class="card-body">
+                <p>Biblio_UNZ est une plateforme moderne de gestion de bibliothèque conçue pour répondre aux besoins des étudiants et du personnel de la bibliothèque universitaire.</p>
+                <p><strong>Fonctionnalités principales :</strong></p>
+                <ul>
+                    <li>📚 Gestion complète du catalogue d'ouvrages</li>
+                    <li>🔐 Authentification sécurisée avec rôles</li>
+                    <li>📖 Emprunt et réservation de livres</li>
+                    <li>💰 Gestion automatisée des pénalités</li>
+                    <li>📧 Notifications par email</li>
+                    <li>📊 Tableaux de bord personnalisés</li>
+                </ul>
+                <p><strong>Technologies :</strong> Django, Bootstrap, JavaScript, SQLite</p>
+                <p class="mb-0"><strong>Université :</strong> Norbert Zongo - Burkina Faso</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 text-center mb-4">
+        <h2><i class="fas fa-users"></i> Équipe de développement</h2>
+        <p class="text-muted">Une équipe passionnée à votre service</p>
+    </div>
+    
+    <div class="col-md-4 col-lg-3 mb-4">
+        <div class="card h-100 text-center shadow-sm">
+            <div class="card-body">
+                <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Yelkouni Wend-nonga Romaric</h5>
+                <span class="badge bg-secondary">Scrum Master</span>
+                <p class="card-text small text-muted mt-2">Chef de projet et développeur principal</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3 mb-4">
+        <div class="card h-100 text-center shadow-sm">
+            <div class="card-body">
+                <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Nabi Rachid</h5>
+                <span class="badge bg-secondary">Développeur</span>
+                <p class="card-text small text-muted mt-2">Développement backend et base de données</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3 mb-4">
+        <div class="card h-100 text-center shadow-sm">
+            <div class="card-body">
+                <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Guelbeogo Saidou</h5>
+                <span class="badge bg-secondary">Développeur</span>
+                <p class="card-text small text-muted mt-2">Développement frontend et interface utilisateur</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3 mb-4">
+        <div class="card h-100 text-center shadow-sm">
+            <div class="card-body">
+                <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Barry Roukietou</h5>
+                <span class="badge bg-secondary">Développeur</span>
+                <p class="card-text small text-muted mt-2">Tests et qualité logicielle</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3 mb-4">
+        <div class="card h-100 text-center shadow-sm">
+            <div class="card-body">
+                <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Bassolé Judicael</h5>
+                <span class="badge bg-secondary">Product Manager</span>
+                <p class="card-text small text-muted mt-2">Gestion des exigences et priorisation</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3 mb-4">
+        <div class="card h-100 text-center shadow-sm">
+            <div class="card-body">
+                <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Sory Sabari Sidiki</h5>
+                <span class="badge bg-secondary">Développeur</span>
+                <p class="card-text small text-muted mt-2">Développement backend et intégration</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3 mb-4">
+        <div class="card h-100 text-center shadow-sm">
+            <div class="card-body">
+                <i class="fas fa-chalkboard-user fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Dr Moise Ouedraogo</h5>
+                <span class="badge bg-primary">Enseignant chercheur</span>
+                <p class="card-text small text-muted mt-2">Encadrement et supervision académique</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <hr>
+        <p class="text-muted">
+            <i class="far fa-copyright"></i> 2026 Biblio_UNZ - Tous droits réservés
+        </p>
+    </div>
+</div>
+{% endblock %}

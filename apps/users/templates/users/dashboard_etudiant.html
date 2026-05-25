@@ -1,27 +1,86 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Étudiant - Biblio_UNZ{% endblock %}
 
 {% block content %}
-<div class="text-center py-5">
-    <h1>📚 Tableau de bord Étudiant</h1>
-    <p>Bienvenue {{ user.first_name }} {{ user.last_name }} !</p>
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Mes emprunts</h5>
-                    <p class="card-text">Consultez vos emprunts en cours</p>
-                    <a href="#" class="btn btn-primary">Voir</a>
+<div style="background-image: linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)), url('{% static 'image/image_biblio1.jpg' %}'); background-size: cover; background-position: center; background-attachment: fixed; padding: 20px; min-height: 100vh;">
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="welcome-section bg-gradient-primary text-white rounded p-4 mb-4" style="background: linear-gradient(135deg, #0d6efd, #0a58ca);">
+                <h2 class="mb-2">📚 Bienvenue {{ user.first_name }} {{ user.last_name }} !</h2>
+                <p class="mb-0">Découvrez les derniers ouvrages disponibles à la bibliothèque universitaire.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card h-100 border-primary shadow-sm" style="background-color: rgba(255, 255, 255, 0.95);">
+                <div class="card-body text-center">
+                    <i class="fas fa-book-open fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">📖 Mes emprunts</h5>
+                    <p class="card-text">Consultez vos emprunts en cours et votre historique</p>
+                    <a href="{% url 'loans:mes_emprunts' %}" class="btn btn-primary">Voir mes emprunts</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Catalogue</h5>
-                    <p class="card-text">Rechercher des ouvrages</p>
-                    <a href="#" class="btn btn-primary">Rechercher</a>
+        <div class="col-md-6 mb-3">
+            <div class="card h-100 border-success shadow-sm" style="background-color: rgba(255, 255, 255, 0.95);">
+                <div class="card-body text-center">
+                    <i class="fas fa-search fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">🔍 Catalogue</h5>
+                    <p class="card-text">Rechercher des ouvrages dans la bibliothèque</p>
+                    <a href="{% url 'books:catalogue' %}" class="btn btn-success">Explorer le catalogue</a>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h4 class="mb-3 text-dark bg-white d-inline-block p-2 rounded shadow-sm" style="--bs-bg-opacity: .8;">📖 Derniers ouvrages ajoutés</h4>
+        </div>
+        
+        {% if derniers_livres %}
+            {% for livre in derniers_livres %}
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 shadow-sm" style="background-color: rgba(255, 255, 255, 0.95);">
+                    <div class="card-body">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-book fa-2x text-primary"></i>
+                        </div>
+                        <h6 class="card-title text-truncate" title="{{ livre.titre }}">{{ livre.titre }}</h6>
+                        <p class="card-text small text-muted">
+                            <i class="fas fa-user"></i> {{ livre.auteur|truncatechars:20 }}<br>
+                            <i class="fas fa-tag"></i> {{ livre.categorie.nom|default:"Non catégorisé" }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% if livre.nombre_disponibles > 0 %}
+                                <span class="badge bg-success">Disponible</span>
+                            {% else %}
+                                <span class="badge bg-danger">Indisponible</span>
+                            {% endif %}
+                            <a href="{% url 'books:livre_detail' livre.id %}" class="btn btn-sm btn-outline-primary">Détails</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center shadow-sm">
+                    <i class="fas fa-info-circle"></i> Aucun livre disponible pour le moment. 
+                    <a href="{% url 'books:catalogue' %}" class="alert-link">Consultez le catalogue</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12 text-center">
+            <a href="{% url 'books:catalogue' %}" class="btn btn-light shadow-sm border">Voir tout le catalogue →</a>
         </div>
     </div>
 </div>

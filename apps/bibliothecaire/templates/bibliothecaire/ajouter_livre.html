@@ -1,20 +1,77 @@
 {% extends 'base.html' %}
 
+{% block title %}Ajouter un livre - Biblio_UNZ{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <div class="card">
-            <div class="card-header bg-primary text-white">➕ Ajouter un livre</div>
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">➕ Ajouter un livre</h4>
+            </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
-                    <div class="mb-3"><label>Titre *</label><input type="text" name="titre" class="form-control" required></div>
-                    <div class="mb-3"><label>Auteur *</label><input type="text" name="auteur" class="form-control" required></div>
-                    <div class="mb-3"><label>ISBN *</label><input type="text" name="isbn" class="form-control" required></div>
-                    <div class="mb-3"><label>Catégorie</label><select name="categorie" class="form-select"><option value="">--</option>{% for c in categories %}<option value="{{ c.id }}">{{ c.nom }}</option>{% endfor %}</select></div>
-                    <div class="mb-3"><label>Nombre d'exemplaires</label><input type="number" name="nombre_exemplaires" class="form-control" value="1"></div>
-                    <div class="mb-3"><label>Rayon</label><input type="text" name="rayon" class="form-control"></div>
-                    <button class="btn btn-primary w-100">Ajouter</button>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Titre *</label>
+                            <input type="text" name="titre" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Auteur *</label>
+                            <input type="text" name="auteur" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">ISBN *</label>
+                            <input type="text" name="isbn" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre d'exemplaires</label>
+                            <input type="number" name="nombre_exemplaires" class="form-control" value="1" min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Maison d'édition</label>
+                            <input type="text" name="maison_edition" class="form-control" placeholder="Ex: Gallimard, Hachette...">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Année d'édition</label>
+                            <input type="number" name="annee_edition" class="form-control" placeholder="Ex: 2024">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Catégorie</label>
+                            <select name="categorie" class="form-select">
+                                <option value="">-- Sélectionner une catégorie --</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}">{{ cat.nom }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">Ou ajoutez une nouvelle ci-dessous</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nouvelle catégorie</label>
+                            <input type="text" name="categorie_nouvelle" class="form-control" placeholder="Ex: Science-fiction, Roman...">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Rayon</label>
+                        <input type="text" name="rayon" class="form-control" placeholder="Ex: A3, B12...">
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Ajouter le livre</button>
+                        <a href="{% url 'bibliothecaire:gerer_catalogue' %}" class="btn btn-secondary">Annuler</a>
+                    </div>
                 </form>
             </div>
         </div>

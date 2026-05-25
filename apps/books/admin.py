@@ -8,10 +8,25 @@ class CategorieAdmin(admin.ModelAdmin):
 
 @admin.register(Ouvrage)
 class OuvrageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'titre', 'auteur', 'isbn', 'categorie', 'nombre_exemplaires', 'nombre_disponibles', 'rayon')
+    list_display = ('id', 'titre', 'auteur', 'isbn', 'categorie', 'maison_edition', 'annee_edition', 'nombre_exemplaires', 'nombre_disponibles')
     list_filter = ('categorie',)
-    search_fields = ('titre', 'auteur', 'isbn')
+    search_fields = ('titre', 'auteur', 'isbn', 'maison_edition')
     readonly_fields = ('date_ajout', 'date_modification')
+    
+    fieldsets = (
+        ('Informations principales', {
+            'fields': ('titre', 'auteur', 'isbn', 'categorie')
+        }),
+        ('Édition', {
+            'fields': ('maison_edition', 'annee_edition')
+        }),
+        ('Gestion des exemplaires', {
+            'fields': ('nombre_exemplaires', 'nombre_disponibles', 'rayon')
+        }),
+        ('Dates', {
+            'fields': ('date_ajout', 'date_modification')
+        }),
+    )
 
 @admin.register(HistoriqueOuvrage)
 class HistoriqueOuvrageAdmin(admin.ModelAdmin):

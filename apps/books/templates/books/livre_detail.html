@@ -1,32 +1,86 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ livre.titre }} - Biblio_UNZ{% endblock %}
+
 {% block content %}
-<div class="card">
-    <div class="card-header bg-primary text-white">
-        <h3>{{ livre.titre }}</h3>
-    </div>
-    <div class="card-body">
-        <p><strong>Auteur:</strong> {{ livre.auteur }}</p>
-        <p><strong>ISBN:</strong> {{ livre.isbn }}</p>
-        <p><strong>Catégorie:</strong> {{ livre.categorie.nom|default:"Non catégorisé" }}</p>
-        <p><strong>Disponibles:</strong> {{ livre.nombre_disponibles }}/{{ livre.nombre_exemplaires }}</p>
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'books:catalogue' %}">Catalogue</a></li>
+                <li class="breadcrumb-item active">{{ livre.titre }}</li>
+            </ol>
+        </nav>
         
-        {% if user.is_authenticated and user.role == 'etudiant' %}
-            {% if livre.nombre_disponibles > 0 %}
-                <form method="post" action="{% url 'loans:emprunter' livre.id %}" style="display:inline">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success">📚 Emprunter</button>
-                </form>
-            {% else %}
-                <form method="post" action="{% url 'loans:reserver' livre.id %}" style="display:inline">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-warning">📝 Réserver</button>
-                </form>
-                <small class="text-muted ms-2">Tous les exemplaires sont empruntés</small>
-            {% endif %}
-        {% endif %}
-        
-        <a href="{% url 'books:catalogue' %}" class="btn btn-secondary">← Retour au catalogue</a>
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">{{ livre.titre }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 35%">Auteur</th>
+                                <td>{{ livre.auteur }}</td>
+                            </tr>
+                            <tr>
+                                <th>ISBN</th>
+                                <td>{{ livre.isbn }}</td>
+                            </tr>
+                            <tr>
+                                <th>Maison d'édition</th>
+                                <td>{{ livre.maison_edition|default:"Non spécifié" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Année d'édition</th>
+                                <td>{{ livre.annee_edition|default:"Non spécifiée" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Catégorie</th>
+                                <td>{{ livre.categorie.nom|default:"Non catégorisé" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Rayon</th>
+                                <td>{{ livre.rayon|default:"Non spécifié" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Exemplaires</th>
+                                <td>Disponibles : {{ livre.nombre_disponibles }} / {{ livre.nombre_exemplaires }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    {% if user.is_authenticated and user.role == 'etudiant' %}
+                        {% if livre.nombre_disponibles > 0 %}
+                            <form method="post" action="{% url 'loans:emprunter' livre.id %}" style="display:inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-book"></i> Emprunter ce livre
+                                </button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'loans:reserver' livre.id %}" style="display:inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-clock"></i> Réserver ce livre
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if user.is_authenticated and user.role == 'bibliothecaire' %}
+                        <a href="{% url 'bibliothecaire:modifier_livre' livre.id %}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'books:catalogue' %}" class="btn btn-secondary">Retour au catalogue</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

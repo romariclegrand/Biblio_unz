@@ -11,17 +11,15 @@
                 <h5 class="mb-0">Filtres</h5>
             </div>
             <div class="card-body">
-                <!-- Barre de recherche -->
                 <form method="get" action="{% url 'books:catalogue' %}">
                     <div class="mb-3">
-                        <label for="recherche" class="form-label">Rechercher</label>
-                        <input type="text" name="recherche" id="recherche" class="form-control" 
-                               placeholder="Titre, auteur ou ISBN..." value="{{ recherche }}">
+                        <label class="form-label">Rechercher</label>
+                        <input type="text" name="recherche" class="form-control" placeholder="Titre, auteur ou ISBN..." value="{{ recherche }}">
                     </div>
                     
                     <div class="mb-3">
-                        <label for="categorie" class="form-label">Catégorie</label>
-                        <select name="categorie" id="categorie" class="form-select">
+                        <label class="form-label">Catégorie</label>
+                        <select name="categorie" class="form-select">
                             <option value="">Toutes les catégories</option>
                             {% for cat in categories %}
                                 <option value="{{ cat.id }}" {% if categorie_selectionnee == cat.id|stringformat:"s" %}selected{% endif %}>
@@ -56,25 +54,31 @@
             <div class="row">
                 {% for livre in livres %}
                     <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card h-100">
+                        <div class="card h-100 shadow-sm">
                             <div class="card-body">
-                                <h5 class="card-title">{{ livre.titre }}</h5>
-                                <p class="card-text">
+                                <h5 class="card-title text-primary">{{ livre.titre }}</h5>
+                                <p class="card-text small">
                                     <strong>Auteur :</strong> {{ livre.auteur }}<br>
                                     <strong>ISBN :</strong> {{ livre.isbn }}<br>
-                                    <strong>Éditeur :</strong> {{ livre.editeur|default:"Non spécifié" }}<br>
-                                    <strong>Année :</strong> {{ livre.annee_publication|default:"Non spécifiée" }}
+                                    {% if livre.maison_edition %}
+                                        <strong>Éditeur :</strong> {{ livre.maison_edition }}<br>
+                                    {% endif %}
+                                    {% if livre.annee_edition %}
+                                        <strong>Année :</strong> {{ livre.annee_edition }}
+                                    {% endif %}
                                 </p>
-                                {% if livre.nombre_disponibles > 0 %}
-                                    <span class="badge bg-success">Disponible ({{ livre.nombre_disponibles }} ex.)</span>
-                                {% else %}
-                                    <span class="badge bg-danger">Indisponible</span>
-                                {% endif %}
-                                {% if livre.categorie %}
-                                    <span class="badge bg-info">{{ livre.categorie.nom }}</span>
-                                {% endif %}
+                                <div class="mt-2">
+                                    {% if livre.nombre_disponibles > 0 %}
+                                        <span class="badge bg-success">Disponible ({{ livre.nombre_disponibles }} ex.)</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Indisponible</span>
+                                    {% endif %}
+                                    {% if livre.categorie %}
+                                        <span class="badge bg-info">{{ livre.categorie.nom }}</span>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="card-footer">
+                            <div class="card-footer bg-transparent">
                                 <a href="{% url 'books:livre_detail' livre.id %}" class="btn btn-sm btn-primary w-100">
                                     Voir détails
                                 </a>

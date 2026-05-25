@@ -9,12 +9,17 @@ class Categorie(models.Model):
     
     def __str__(self):
         return self.nom
+    
+    class Meta:
+        ordering = ['nom']
 
 class Ouvrage(models.Model):
     titre = models.CharField(max_length=200)
     auteur = models.CharField(max_length=200)
     isbn = models.CharField(max_length=13, unique=True)
     categorie = models.ForeignKey(Categorie, on_delete=models.SET_NULL, null=True, blank=True)
+    maison_edition = models.CharField(max_length=100, blank=True, null=True, verbose_name="Maison d'édition")
+    annee_edition = models.IntegerField(blank=True, null=True, verbose_name="Année d'édition")
     nombre_exemplaires = models.IntegerField(default=1)
     nombre_disponibles = models.IntegerField(default=1)
     rayon = models.CharField(max_length=100, blank=True, null=True)
@@ -43,7 +48,7 @@ class HistoriqueOuvrage(models.Model):
     date_action = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.get_action_display()} - {self.ouvrage.titre} - {self.date_action.strftime('%d/%m/%Y %H:%M')}"
+        return f"{self.get_action_display()} - {self.ouvrage.titre}"
     
     class Meta:
         ordering = ['-date_action']

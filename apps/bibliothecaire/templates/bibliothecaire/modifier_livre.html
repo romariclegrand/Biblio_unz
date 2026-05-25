@@ -1,20 +1,79 @@
 {% extends 'base.html' %}
 
+{% block title %}Modifier un livre - Biblio_UNZ{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <div class="card">
-            <div class="card-header bg-warning">✏️ Modifier le livre</div>
+            <div class="card-header bg-warning">
+                <h4 class="mb-0">✏️ Modifier le livre</h4>
+            </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
-                    <div class="mb-3"><label>Titre *</label><input type="text" name="titre" class="form-control" value="{{ livre.titre }}" required></div>
-                    <div class="mb-3"><label>Auteur *</label><input type="text" name="auteur" class="form-control" value="{{ livre.auteur }}" required></div>
-                    <div class="mb-3"><label>ISBN *</label><input type="text" name="isbn" class="form-control" value="{{ livre.isbn }}" required></div>
-                    <div class="mb-3"><label>Catégorie</label><select name="categorie" class="form-select"><option value="">--</option>{% for c in categories %}<option value="{{ c.id }}" {% if livre.categorie.id == c.id %}selected{% endif %}>{{ c.nom }}</option>{% endfor %}</select></div>
-                    <div class="mb-3"><label>Nombre d'exemplaires</label><input type="number" name="nombre_exemplaires" class="form-control" value="{{ livre.nombre_exemplaires }}"></div>
-                    <div class="mb-3"><label>Rayon</label><input type="text" name="rayon" class="form-control" value="{{ livre.rayon }}"></div>
-                    <button class="btn btn-primary w-100">Enregistrer</button>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Titre *</label>
+                            <input type="text" name="titre" class="form-control" value="{{ livre.titre }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Auteur *</label>
+                            <input type="text" name="auteur" class="form-control" value="{{ livre.auteur }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">ISBN *</label>
+                            <input type="text" name="isbn" class="form-control" value="{{ livre.isbn }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre d'exemplaires</label>
+                            <input type="number" name="nombre_exemplaires" class="form-control" value="{{ livre.nombre_exemplaires }}" min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Maison d'édition</label>
+                            <input type="text" name="maison_edition" class="form-control" value="{{ livre.maison_edition|default:'' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Année d'édition</label>
+                            <input type="number" name="annee_edition" class="form-control" value="{{ livre.annee_edition|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Catégorie</label>
+                            <select name="categorie" class="form-select">
+                                <option value="">-- Aucune --</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}" {% if livre.categorie and livre.categorie.id == cat.id %}selected{% endif %}>
+                                    {{ cat.nom }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">Ou ajoutez une nouvelle ci-dessous</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nouvelle catégorie</label>
+                            <input type="text" name="categorie_nouvelle" class="form-control" placeholder="Ex: Science-fiction">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Rayon</label>
+                        <input type="text" name="rayon" class="form-control" value="{{ livre.rayon|default:'' }}">
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                        <a href="{% url 'bibliothecaire:gerer_catalogue' %}" class="btn btn-secondary">Annuler</a>
+                    </div>
                 </form>
             </div>
         </div>

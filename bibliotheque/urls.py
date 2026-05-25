@@ -10,4 +10,5 @@ urlpatterns = [
     path('loans/', include('apps.loans.urls')),
     path('bibliothecaire/', include('apps.bibliothecaire.urls')),
     path('administrateur/', include('apps.administrateur.urls')),
+    path('apropos/', include('apps.core.urls')),
 ]
