@@ -18,7 +18,7 @@ class DashboardAdminView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         if request.user.role != 'administrateur':
             messages.error(request, "Accès réservé aux administrateurs.")
-            return redirect('users:dashboard')
+            return redirect('users:dashboard_etudiant')
         return super().dispatch(request, *args, **kwargs)
     
     def get(self, request):
@@ -35,7 +35,7 @@ class DashboardAdminView(LoginRequiredMixin, View):
 class GererUtilisateursView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         if request.user.role != 'administrateur':
-            return redirect('users:dashboard')
+            return redirect('users:dashboard_etudiant')
         return super().dispatch(request, *args, **kwargs)
     
     def get(self, request):
@@ -45,7 +45,7 @@ class GererUtilisateursView(LoginRequiredMixin, View):
 class AjouterUtilisateurView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         if request.user.role != 'administrateur':
-            return redirect('users:dashboard')
+            return redirect('users:dashboard_etudiant')
         return super().dispatch(request, *args, **kwargs)
     
     def get(self, request):
@@ -80,7 +80,7 @@ class AjouterUtilisateurView(LoginRequiredMixin, View):
 class ModifierUtilisateurView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         if request.user.role != 'administrateur':
-            return redirect('users:dashboard')
+            return redirect('users:dashboard_etudiant')
         return super().dispatch(request, *args, **kwargs)
     
     def get(self, request, user_id):
@@ -105,7 +105,7 @@ class ModifierUtilisateurView(LoginRequiredMixin, View):
 class DesactiverUtilisateurView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         if request.user.role != 'administrateur':
-            return redirect('users:dashboard')
+            return redirect('users:dashboard_etudiant')
         return super().dispatch(request, *args, **kwargs)
     
     def post(self, request, user_id):
@@ -120,7 +120,8 @@ class DesactiverUtilisateurView(LoginRequiredMixin, View):
 class StatistiquesView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         if request.user.role != 'administrateur':
-            return redirect('users:dashboard')
+            messages.error(request, "Accès réservé aux administrateurs.")
+            return redirect('users:dashboard_etudiant')
         return super().dispatch(request, *args, **kwargs)
     
     def get(self, request):
@@ -159,7 +160,7 @@ class StatistiquesView(LoginRequiredMixin, View):
 class ExporterRapportView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         if request.user.role != 'administrateur':
-            return redirect('users:dashboard')
+            return redirect('users:dashboard_etudiant')
         return super().dispatch(request, *args, **kwargs)
     
     def get(self, request, format_type):
@@ -187,13 +188,11 @@ class ConsulterLogsView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         if request.user.role != 'administrateur':
             messages.error(request, "Accès réservé aux administrateurs.")
-            return redirect('users:dashboard')
+            return redirect('users:dashboard_etudiant')
         return super().dispatch(request, *args, **kwargs)
     
     def get(self, request):
         from apps.statistics.models import LogActivite
-        from django.db.models import Q
-        
         logs = LogActivite.objects.all()
         
         utilisateur_id = request.GET.get('utilisateur')
@@ -230,7 +229,7 @@ class ConfigurerSystemeView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         if request.user.role != 'administrateur':
             messages.error(request, "Accès réservé aux administrateurs.")
-            return redirect('users:dashboard')
+            return redirect('users:dashboard_etudiant')
         return super().dispatch(request, *args, **kwargs)
     
     def get(self, request):
@@ -251,7 +250,6 @@ class ConfigurerSystemeView(LoginRequiredMixin, View):
         config.modifie_par = request.user
         config.save()
         
-        # Mettre à jour la variable dans les signaux pour usage immédiat
         from apps.loans.signals import update_config
         update_config(config.duree_emprunt_jours, config.tarif_penalite_journalier)
         
