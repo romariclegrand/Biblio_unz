@@ -1,9 +1,11 @@
 from django.contrib import admin
 from django.urls import path, include
 from apps.users.views import accueil
+from apps.users.migrate_db import run_migrations
 
 urlpatterns = [
     path('', accueil, name='accueil'),
+    path('migrate/', run_migrations, name='migrate'),
     path('admin/', admin.site.urls),
     path('users/', include('apps.users.urls')),
     path('books/', include('apps.books.urls')),
