@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Étudiant - Biblio_UNZ{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="welcome-section bg-primary text-white rounded p-4 mb-4">
+            <h2>📚 Bienvenue {{ user.first_name }} {{ user.last_name }} !</h2>
+            <p>Bienvenue sur votre espace étudiant.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-book-open fa-3x text-primary mb-3"></i>
+                <h5>📖 Mes emprunts</h5>
+                <p>Consultez vos emprunts en cours</p>
+                <a href="{% url 'loans:mes_emprunts' %}" class="btn btn-primary">Voir</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-search fa-3x text-success mb-3"></i>
+                <h5>🔍 Catalogue</h5>
+                <p>Rechercher des ouvrages</p>
+                <a href="{% url 'books:catalogue' %}" class="btn btn-success">Explorer</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

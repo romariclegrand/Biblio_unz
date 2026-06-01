@@ -3,7 +3,6 @@ from django.views import View
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from apps.books.models import Ouvrage
 from .models import Utilisateur
 
 def accueil(request):
@@ -83,21 +82,15 @@ class InscriptionView(View):
 
 class DashboardEtudiantView(LoginRequiredMixin, View):
     def get(self, request):
+        # Redirection si mauvais rôle
         if request.user.role != 'etudiant':
             if request.user.role == 'bibliothecaire':
                 return redirect('bibliothecaire:dashboard')
             elif request.user.role == 'administrateur':
                 return redirect('administrateur:dashboard')
         
-        try:
-            derniers_livres = Ouvrage.objects.all().order_by('-date_ajout')[:8]
-        except:
-            derniers_livres = []
-        
-        return render(request, 'users/dashboard_etudiant.html', {
-            'user': request.user,
-            'derniers_livres': derniers_livres
-        })
+        # Version simple sans livres (pour éviter l'erreur)
+        return render(request, 'users/dashboard_etudiant_simple.html', {'user': request.user})
 
 class ProfilView(LoginRequiredMixin, View):
     def get(self, request):
