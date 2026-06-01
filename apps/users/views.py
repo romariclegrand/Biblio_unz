@@ -89,8 +89,10 @@ class DashboardEtudiantView(LoginRequiredMixin, View):
             elif request.user.role == 'administrateur':
                 return redirect('administrateur:dashboard')
         
-        # Récupérer les 8 derniers livres ajoutés
-        derniers_livres = Ouvrage.objects.all().order_by('-date_ajout')[:8]
+        try:
+            derniers_livres = Ouvrage.objects.all().order_by('-date_ajout')[:8]
+        except:
+            derniers_livres = []
         
         return render(request, 'users/dashboard_etudiant.html', {
             'user': request.user,
