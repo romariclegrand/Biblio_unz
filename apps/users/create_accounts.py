@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import get_user_model
 
@@ -6,10 +6,10 @@ User = get_user_model()
 
 @csrf_exempt
 def create_accounts(request):
-    results = []
+    response_text = "<h1>Création des comptes</h1><pre>"
     
-    # Créer un bibliothécaire
-    biblio, created_b = User.objects.get_or_create(
+    # Créer bibliothécaire
+    biblio, created = User.objects.get_or_create(
         username='biblio1',
         defaults={
             'email': 'biblio@bibliotheque.com',
@@ -19,15 +19,15 @@ def create_accounts(request):
             'is_staff': True
         }
     )
-    if created_b:
+    if created:
         biblio.set_password('biblio123')
         biblio.save()
-        results.append({'type': 'bibliothecaire', 'username': 'biblio1', 'password': 'biblio123', 'created': True})
+        response_text += "✅ Bibliothécaire créé : biblio1 / biblio123\n"
     else:
-        results.append({'type': 'bibliothecaire', 'username': 'biblio1', 'created': False})
+        response_text += "ℹ️ biblio1 existe déjà\n"
     
-    # Créer un étudiant de test
-    etudiant, created_e = User.objects.get_or_create(
+    # Créer étudiant
+    etudiant, created = User.objects.get_or_create(
         username='etudiant1',
         defaults={
             'email': 'etudiant@test.com',
@@ -37,11 +37,17 @@ def create_accounts(request):
             'ine': '2024TEST12345'
         }
     )
-    if created_e:
+    if created:
         etudiant.set_password('etudiant123')
         etudiant.save()
-        results.append({'type': 'etudiant', 'username': 'etudiant1', 'password': 'etudiant123', 'created': True})
+        response_text += "✅ Étudiant créé : etudiant1 / etudiant123\n"
     else:
-        results.append({'type': 'etudiant', 'username': 'etudiant1', 'created': False})
+        response_text += "ℹ️ etudiant1 existe déjà\n"
     
-    return JsonResponse({'status': 'success', 'accounts': results})
+    # Lister tous les utilisateurs
+    response_text += "\n📋 Liste des comptes :\n"
+    for u in User.objects.all():
+        response_text += f"   - {u.username} : {u.role}\n"
+    
+    response_text += "</pre>"
+    return HttpResponse(response_text)
